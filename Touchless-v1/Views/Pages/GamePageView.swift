@@ -17,8 +17,9 @@ struct GamePageView: View {
     @State private var p1Progress: String = ""
     @State private var p2Progress: String = ""
     
-    // 🛑 NEW: State for the instruction screen
+    // 🛑 State for the instruction screen
     @State private var showInstruction: Bool = true
+    @State private var dismissInstructionWorkItem: DispatchWorkItem? = nil
     
     var body: some View {
         ZStack {
@@ -33,21 +34,23 @@ struct GamePageView: View {
                     onMainMenu: onReturnToMenu
                 )
             } else {
-                // 🎮 STATE A: THE GAME IS RUNNING
-                if isMultiplayer {
-                    HStack(spacing: 0) {
-                        ZStack {
-                            Color.blue.opacity(0.15).ignoresSafeArea()
-                            renderActiveGame(score: $p1Score, progressText: $p1Progress, zone: .leftPlayer)
+                // 🎮 STATE A: THE ACTIVE GAME (Only starts and processes inputs when instruction is dismissed!)
+                if !showInstruction {
+                    if isMultiplayer {
+                        HStack(spacing: 0) {
+                            ZStack {
+                                Color.blue.opacity(0.15).ignoresSafeArea()
+                                renderActiveGame(score: $p1Score, progressText: $p1Progress, zone: .leftPlayer)
+                            }
+                            Rectangle().fill(Color.white).frame(width: 4).ignoresSafeArea()
+                            ZStack {
+                                Color.red.opacity(0.15).ignoresSafeArea()
+                                renderActiveGame(score: $p2Score, progressText: $p2Progress, zone: .rightPlayer)
+                            }
                         }
-                        Rectangle().fill(Color.white).frame(width: 4).ignoresSafeArea()
-                        ZStack {
-                            Color.red.opacity(0.15).ignoresSafeArea()
-                            renderActiveGame(score: $p2Score, progressText: $p2Progress, zone: .rightPlayer)
-                        }
+                    } else {
+                        renderActiveGame(score: $p1Score, progressText: $p1Progress, zone: .solo)
                     }
-                } else {
-                    renderActiveGame(score: $p1Score, progressText: $p1Progress, zone: .solo)
                 }
                 
                 // 🎨 THE UNIVERSAL HUD OVERLAY
@@ -58,12 +61,13 @@ struct GamePageView: View {
                     pauseMenuOverlay
                 }
                 
-                // 🛑 THE BIG INSTRUCTION OVERLAY
+                // 🛑 THE BIG INSTRUCTION OVERLAY (Tap anywhere to skip!)
                 if showInstruction {
                     InstructionOverlay(
                         actionWord: getActionWord(),
                         description: getInstruction(),
-                        videoFilename: getVideoFilename()
+                        videoFilename: getVideoFilename(),
+                        onSkip: skipInstruction
                     )
                     .transition(.opacity)
                     .zIndex(100) // Forces it to the very top!
@@ -80,8 +84,9 @@ struct GamePageView: View {
         }
     }
     
-    // --- 🚀 NEW HELPER: Timer & Overlay Logic ---
+    // --- 🚀 HELPER: Timer & Overlay Logic ---
     private func triggerInstruction() {
+        dismissInstructionWorkItem?.cancel()
         showInstruction = true
         director.pauseTimer() // Pause game so they don't lose time watching the video!
         
@@ -89,13 +94,27 @@ struct GamePageView: View {
         let filename = getVideoFilename()
         let exactDuration = getVideoDuration(filename: filename)
         
-        // 2. Tutup instruksi sesuai durasi video
-        DispatchQueue.main.asyncAfter(deadline: .now() + exactDuration) {
-            withAnimation(.easeInOut(duration: 0.3)) {
-                showInstruction = false
+        // 2. Tutup instruksi sesuai durasi video secara otomatis jika tidak di-skip
+        let workItem = DispatchWorkItem { [weak director] in
+            guard self.showInstruction else { return }
+            withAnimation(.easeInOut(duration: 0.25)) {
+                self.showInstruction = false
             }
-            director.resumeTimer() // Start the 5-second clock tepat setelah video hilang!
+            director?.resumeTimer()
         }
+        self.dismissInstructionWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + exactDuration, execute: workItem)
+    }
+    
+    // ⏩ SKIP TUTORIAL: Instantly starts the game when player taps anywhere
+    private func skipInstruction() {
+        dismissInstructionWorkItem?.cancel()
+        dismissInstructionWorkItem = nil
+        guard showInstruction else { return }
+        withAnimation(.easeInOut(duration: 0.2)) {
+            showInstruction = false
+        }
+        director.resumeTimer() // Start the clock immediately!
     }
     
     // --- ⏱️ HELPER: Otomatis baca durasi file .mov ---

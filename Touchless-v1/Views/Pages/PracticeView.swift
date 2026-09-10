@@ -31,30 +31,33 @@ struct DebugTrackerView: View {
     @State private var p2WinCount: Int = 0
     @State private var p2Progress: String = "" // Pipeline Catcher P2
     
-    // 🛑 NEW: State to control the instruction overlay
+    // 🛑 State to control the instruction overlay
     @State private var showInstruction: Bool = true
+    @State private var dismissInstructionWorkItem: DispatchWorkItem? = nil
     
     var body: some View {
         ZStack {
             // ==========================================
-            // 1. THE STAGE (The Camera & Game Logic)
+            // 1. THE STAGE (Only active when tutorial is dismissed!)
             // ==========================================
-            if isMultiplayerMode {
-                // ⚔️ SPLIT SCREEN
-                HStack(spacing: 0) {
-                    ZStack {
-                        Color.blue.opacity(0.15).ignoresSafeArea()
-                        renderScene(for: selectedScene, score: $mockScore, progressText: $p1Progress, wins: $winCount, zone: .leftPlayer)
+            if !showInstruction {
+                if isMultiplayerMode {
+                    // ⚔️ SPLIT SCREEN
+                    HStack(spacing: 0) {
+                        ZStack {
+                            Color.blue.opacity(0.15).ignoresSafeArea()
+                            renderScene(for: selectedScene, score: $mockScore, progressText: $p1Progress, wins: $winCount, zone: .leftPlayer)
+                        }
+                        Rectangle().fill(Color.white).frame(width: 4).ignoresSafeArea()
+                        ZStack {
+                            Color.red.opacity(0.15).ignoresSafeArea()
+                            renderScene(for: selectedScene, score: $p2Score, progressText: $p2Progress, wins: $p2WinCount, zone: .rightPlayer)
+                        }
                     }
-                    Rectangle().fill(Color.white).frame(width: 4).ignoresSafeArea()
-                    ZStack {
-                        Color.red.opacity(0.15).ignoresSafeArea()
-                        renderScene(for: selectedScene, score: $p2Score, progressText: $p2Progress, wins: $p2WinCount, zone: .rightPlayer)
-                    }
+                } else {
+                    // 🧍‍♂️ SOLO MODE
+                    renderScene(for: selectedScene, score: $mockScore, progressText: $p1Progress, wins: $winCount, zone: .solo)
                 }
-            } else {
-                // 🧍‍♂️ SOLO MODE
-                renderScene(for: selectedScene, score: $mockScore, progressText: $p1Progress, wins: $winCount, zone: .solo)
             }
             
             // ==========================================
@@ -63,13 +66,14 @@ struct DebugTrackerView: View {
             sandboxHUD
             
             // ==========================================
-            // 3. 🛑 THE INSTRUCTION OVERLAY
+            // 3. 🛑 THE INSTRUCTION OVERLAY (Tap anywhere to skip!)
             // ==========================================
             if showInstruction {
                 InstructionOverlay(
                     actionWord: getActionWord(for: selectedScene),
                     description: getInstruction(for: selectedScene),
-                    videoFilename: getVideoFilename(for: selectedScene) // ⬅️ Passes the video name!
+                    videoFilename: getVideoFilename(for: selectedScene),
+                    onSkip: skipInstruction
                 )
                 .transition(.opacity)
                 .zIndex(100) // Forces it to the very top!
@@ -89,9 +93,10 @@ struct DebugTrackerView: View {
         }
     }
     
-    // --- 🚀 NEW HELPER: Instruction Trigger Logic ---
+    // --- 🚀 HELPER: Instruction Trigger Logic ---
     private func triggerInstruction() {
-            showInstruction = true
+        dismissInstructionWorkItem?.cancel()
+        showInstruction = true
         
         // 1. Ambil nama file videonya
         let filename = getVideoFilename(for: selectedScene)
@@ -99,11 +104,24 @@ struct DebugTrackerView: View {
         // 2. Minta sistem menghitung durasi persisnya
         let exactDuration = getVideoDuration(filename: filename)
         
-        // 3. Gunakan durasi aslinya untuk menutup overlay!
-        DispatchQueue.main.asyncAfter(deadline: .now() + exactDuration) {
-            withAnimation(.easeInOut(duration: 0.3)) {
-                showInstruction = false
+        // 3. Gunakan durasi aslinya untuk menutup overlay otomatis jika tidak di-skip
+        let workItem = DispatchWorkItem {
+            guard self.showInstruction else { return }
+            withAnimation(.easeInOut(duration: 0.25)) {
+                self.showInstruction = false
             }
+        }
+        self.dismissInstructionWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + exactDuration, execute: workItem)
+    }
+    
+    // ⏩ SKIP TUTORIAL: Instantly starts the scene when player taps anywhere
+    private func skipInstruction() {
+        dismissInstructionWorkItem?.cancel()
+        dismissInstructionWorkItem = nil
+        guard showInstruction else { return }
+        withAnimation(.easeInOut(duration: 0.2)) {
+            showInstruction = false
         }
     }
     
