@@ -10,6 +10,7 @@ enum DebugScene: String, CaseIterable {
     case cymbals = "🥁 CYMBALS!"
     case furniture = "🛏️ ROOM MAKEOVER!"
     case bonus = "6️⃣7️⃣ BONUS!"
+    case wipe = "🧽 WIPE WINDOW!"
 }
 
 struct DebugTrackerView: View {
@@ -261,6 +262,7 @@ struct DebugTrackerView: View {
         case .cymbals: CymbalScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in wins.wrappedValue += 1 }
         case .furniture: FurnitureScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in wins.wrappedValue += 1 }
         case .bonus: BonusScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in wins.wrappedValue += 1 }
+        case .wipe: WipeScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in wins.wrappedValue += 1 }
         }
     }
     
@@ -313,6 +315,7 @@ struct DebugTrackerView: View {
         case .cymbals: return "CYMBALS PRACTICE!"
         case .furniture: return "HOME RENO!"
         case .bonus: return "67 REDEMPTION!"
+        case .wipe: return "WIPE THE WINDOW!"
         }
     }
     
@@ -325,6 +328,7 @@ struct DebugTrackerView: View {
         case .cymbals: return "CLAP your hands together loudly!"
         case .furniture: return "PINCH the furniture and DRAG it away!"
         case .bonus: return "ALTERNATE PUMPING your arms up and down!"
+        case .wipe: return "WIPE your cloth across the screen to clean the window!"
         }
     }
     
@@ -338,6 +342,7 @@ struct DebugTrackerView: View {
         case .cymbals: return "Clap_Recording"
         case .furniture: return "Pinch_Recording"
         case .bonus: return "67_Recording"
+        case .wipe: return "Wave_Recording"
         }
     }
 }

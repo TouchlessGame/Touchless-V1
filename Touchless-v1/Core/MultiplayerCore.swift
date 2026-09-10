@@ -32,9 +32,13 @@ struct CoordinateMapper {
             zonedX = (mirroredX - 0.5) * 2.0
         }
         
+        // Vision origin is lower-left (0 at bottom, 1 at top)
+        // SwiftUI origin is top-left (0 at top, height at bottom)
+        let invertedY = 1.0 - rawPoint.y
+        
         return CGPoint(
             x: zonedX * screenSize.width,
-            y: rawPoint.y * screenSize.height
+            y: invertedY * screenSize.height
         )
     }
 }

@@ -77,7 +77,7 @@ struct FurnitureScene: View {
             
             let localHandPoint = CoordinateMapper.localPoint(rawPoint: rawIndex, zone: playerZone, screenSize: size)
             let localHandX = localHandPoint.x / size.width
-            let localHandY = 1.0 - (localHandPoint.y / size.height)
+            let localHandY = localHandPoint.y / size.height
             
             let currentDistance = hypot(localHandX - chairLocalPosition.x, localHandY - chairLocalPosition.y)
             

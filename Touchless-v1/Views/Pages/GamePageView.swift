@@ -120,6 +120,7 @@ struct GamePageView: View {
         case .cymbals: CymbalScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in }
         case .furniture: FurnitureScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in }
         case .bonus: BonusScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in }
+        case .wipe: WipeScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in }
         }
     }
     
@@ -256,6 +257,7 @@ struct GamePageView: View {
         case .cymbals: return "Clap_Recording"
         case .furniture: return "Pinch_Recording"
         case .bonus: return "67_Recording"
+        case .wipe: return "Wave_Recording"
         }
     }
 
@@ -294,6 +296,7 @@ struct GamePageView: View {
         case .cymbals: return "CYMBALS PRACTICE!"
         case .furniture: return "HOME RENO!"
         case .bonus: return "67 REDEMPTION!"
+        case .wipe: return "WIPE THE WINDOW!"
         }
     }
     
@@ -306,6 +309,7 @@ struct GamePageView: View {
         case .cymbals: return "CLAP your hands together loudly!"
         case .furniture: return "PINCH the furniture and DRAG it away!"
         case .bonus: return "ALTERNATE PUMPING your arms up and down!"
+        case .wipe: return "WIPE your cloth across the screen to clean the window!"
         }
     }
     

@@ -30,9 +30,9 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		988E9FD92F66AB5300569017 /* UpstairsNeighborSim */ = {
+		988E9FD92F66AB5300569017 /* Touchless-v1 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = UpstairsNeighborSim;
+			path = "Touchless-v1";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -65,7 +65,7 @@
 		988E9FCE2F66AB5300569017 = {
 			isa = PBXGroup;
 			children = (
-				988E9FD92F66AB5300569017 /* UpstairsNeighborSim */,
+				988E9FD92F66AB5300569017 /* Touchless-v1 */,
 				988E9FD82F66AB5300569017 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -96,7 +96,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				988E9FD92F66AB5300569017 /* UpstairsNeighborSim */,
+				988E9FD92F66AB5300569017 /* Touchless-v1 */,
 			);
 			name = UpstairsNeighborSim;
 			packageProductDependencies = (
@@ -168,7 +168,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 988E9FD22F66AB5300569017 /* Build configuration list for PBXProject "UpstairsNeighborSim" */;
+			buildConfigurationList = 988E9FD22F66AB5300569017 /* Build configuration list for PBXProject "Touchless-v1" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -572,7 +572,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		988E9FD22F66AB5300569017 /* Build configuration list for PBXProject "UpstairsNeighborSim" */ = {
+		988E9FD22F66AB5300569017 /* Build configuration list for PBXProject "Touchless-v1" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				988E9FF62F66AB5400569017 /* Debug */,
