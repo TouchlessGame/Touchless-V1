@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 struct MainMenuView: View {
     @ObservedObject var engine: TrackingEngine
@@ -8,6 +9,7 @@ struct MainMenuView: View {
     
     @State private var isPulsing = false
     @State private var selectedRounds: Int = 5
+    @State private var logoImage: NSImage? = MainMenuView.loadLogo()
     
     // 🔊 Volume State
     @State private var volume: Float = 0.5
@@ -20,80 +22,60 @@ struct MainMenuView: View {
             HStack(spacing: 0) {
                 
                 // 👈 LEFT COLUMN (Main Content, Left Aligned)
-                VStack(alignment: .leading, spacing: 30) {
+                VStack(alignment: .leading, spacing: 24) {
                     Spacer()
                     
-                    // --- 1. INTEGRATED, ANIMATED ANGER EMBLEM ---
-                    ZStack(alignment: .center) {
-                        // Base tilted house element
-                        Text("🏠")
-                            .font(.system(size: 110))
-                            .offset(x: -200, y: -100)
-                            .rotationEffect(.degrees(-15))
-                            .shadow(color: .red.opacity(0.4), radius: 10)
-                        
-                        // The Title
-                        VStack(alignment: .leading, spacing: -25) {
-                            Text("NOISY")
-                                .font(.system(size: 110, weight: .black, design: .rounded))
-                                .foregroundColor(.red)
-                                .shadow(color: .red.opacity(0.6), radius: isPulsing ? 20 : 10)
-                                .zIndex(1)
-                            
-                            Text("NEIGHBOR")
-                                .font(.system(size: 85, weight: .black, design: .rounded))
-                                .foregroundColor(.white)
-                                .shadow(color: .black, radius: 3)
-                                .zIndex(0)
+                    // --- 1. SIDE BY SIDE LOGO ---
+                    ZStack(alignment: .leading) {
+                        if let logo = logoImage {
+                            Image(nsImage: logo)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(maxWidth: 360, maxHeight: 200, alignment: .leading)
+                                .shadow(color: .black.opacity(0.35), radius: 12, y: 6)
+                        } else {
+                            VStack(alignment: .leading, spacing: -8) {
+                                Text("Side")
+                                    .font(.system(size: 80, weight: .black, design: .rounded))
+                                    .foregroundColor(Color(red: 0.1, green: 0.45, blue: 0.95))
+                                Text("by Side")
+                                    .font(.system(size: 70, weight: .black, design: .rounded))
+                                    .foregroundColor(Color(red: 0.95, green: 0.2, blue: 0.2))
+                            }
                         }
-                        .rotationEffect(.degrees(-4))
-                        .offset(x: 20)
-
-                        // 😡 NEAT ACCENT EMOJIS (Just 3 for flavor)
-                        Text("💢") // Anger vein symbol
-                            .font(.system(size: 45))
-                            .offset(x: 150, y: -80) // Top right
-                            .rotationEffect(.degrees(15))
-                        
-                        Text("🔊") // Noise
-                            .font(.system(size: 40))
-                            .offset(x: -220, y: 70) // Bottom left
-                            .rotationEffect(.degrees(-10))
-                        
-                        Text("😡") // Annoyed neighbor
-                            .font(.system(size: 35))
-                            .offset(x: 130, y: 40) // Bottom right
                     }
-                    // The entire integrated emblem pulses
-                    .rotationEffect(.degrees(isPulsing ? -2 : 1))
-                    .scaleEffect(isPulsing ? 1.03 : 0.97)
-                    .animation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true), value: isPulsing)
+                    .scaleEffect(isPulsing ? 1.02 : 0.98)
+                    .animation(.easeInOut(duration: 1.6).repeatForever(autoreverses: true), value: isPulsing)
                     
-                    // --- 2. UPGRADED GOAL MISSION CARD ---
+                    // --- 2. MISSION CARD ---
                     HStack(alignment: .center, spacing: 15) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.system(size: 35))
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 32))
                             .foregroundColor(.yellow)
                         
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("MISSION OBJECTIVE")
+                            Text("TOUCHLESS FAMILY PARTY")
                                 .font(.system(.caption, design: .monospaced).bold())
                                 .foregroundColor(.yellow)
+                                .tracking(1.5)
                             
-                            Text("MASTER THE CHALLENGES. RACK UP COMPLAINTS.")
+                            Text("MOVE TOGETHER. PLAY TOGETHER.")
                                 .font(.system(size: 16, weight: .bold, design: .rounded))
                                 .foregroundColor(.white)
                             
-                            Text("Be the worst tenant on the floor.")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(.gray)
+                            Text("Controller-free gesture games for all generations.")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.white.opacity(0.75))
                         }
                     }
                     .padding(15)
                     .background(
                         RoundedRectangle(cornerRadius: 15)
-                            .stroke(Color.yellow.opacity(0.6), lineWidth: 2)
-                            .background(Color.yellow.opacity(0.05).cornerRadius(15))
+                            .fill(.ultraThinMaterial)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 15)
+                                    .stroke(Color.white.opacity(0.2), lineWidth: 1.5)
+                            )
                     )
                     
                     // --- 3. ROUND SELECTOR HUD ---
@@ -125,7 +107,7 @@ struct MainMenuView: View {
                     // --- 4. NAVIGATION BUTTONS (Solid filled) ---
                     VStack(alignment: .leading, spacing: 15) {
                         Button(action: { onPlaySolo(selectedRounds) }) {
-                            MenuButtonView(title: "🧍‍♂️ SOLO CHAOS", color: .blue)
+                            MenuButtonView(title: "🧍‍♂️ SOLO PLAY", color: .blue)
                         }
                         .buttonStyle(.plain)
                         
@@ -188,8 +170,53 @@ struct MainMenuView: View {
                     .padding(.bottom, 40)
                 }
             }
+            .onAppear {
+                isPulsing = true
+                logoImage = MainMenuView.loadLogo()
+            }
         }
-        .onAppear { isPulsing = true }
+    }
+    
+    static func loadLogo() -> NSImage? {
+        // 1. Try bundled high-DPI cropped PNG
+        if let url = Bundle.main.url(forResource: "SideBySide - Logo", withExtension: "png") ??
+                     Bundle.main.url(forResource: "SideBySide - Logo", withExtension: "png", subdirectory: "game-assets") {
+            if let img = NSImage(contentsOf: url) {
+                return img
+            }
+        }
+        
+        // 2. Direct file paths for PNG
+        let pngPaths = [
+            "Touchless-V1/Touchless-v1/Assets/game-assets/SideBySide - Logo.png",
+            "Touchless-v1/Assets/game-assets/SideBySide - Logo.png",
+            "/Users/clarissaaditjakra/Documents/GitHub/TouchlessGame/Touchless-V1/Touchless-v1/Assets/game-assets/SideBySide - Logo.png"
+        ]
+        for path in pngPaths {
+            if let img = NSImage(contentsOf: URL(fileURLWithPath: path)) {
+                return img
+            }
+        }
+        
+        // 3. Fallback to bundled SVG
+        if let url = Bundle.main.url(forResource: "SideBySide - Logo", withExtension: "svg") ??
+                     Bundle.main.url(forResource: "SideBySide - Logo", withExtension: "svg", subdirectory: "game-assets") {
+            if let img = NSImage(contentsOf: url) {
+                return img
+            }
+        }
+        
+        let svgPaths = [
+            "Touchless-V1/Touchless-v1/Assets/game-assets/SideBySide - Logo.svg",
+            "Touchless-v1/Assets/game-assets/SideBySide - Logo.svg",
+            "/Users/clarissaaditjakra/Documents/GitHub/TouchlessGame/Touchless-V1/Touchless-v1/Assets/game-assets/SideBySide - Logo.svg"
+        ]
+        for path in svgPaths {
+            if let img = NSImage(contentsOf: URL(fileURLWithPath: path)) {
+                return img
+            }
+        }
+        return nil
     }
 }
 

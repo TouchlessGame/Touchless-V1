@@ -3,22 +3,21 @@ import AVFoundation
 
 // 🔧 A cleaner list of scenes to test
 enum DebugScene: String, CaseIterable {
-    case stomp = "🥾 STOMP!"
-    case drill = "🛠️ DRILL!"
-    case party = "💃 PARTY!"
-    case dj = "🎧 DJ!"
-    case cymbals = "🥁 CYMBALS!"
-    case furniture = "🛏️ ROOM MAKEOVER!"
-    case bonus = "6️⃣7️⃣ BONUS!"
     case wipe = "🧽 WIPE WINDOW!"
+    case fall = "🍎 CATCH FRUITS!"
+    case watering = "🌱 WATER PLANT!"
+    case bubble = "🫧 POP BUBBLES!"
+    case hotPotato = "🥔 HOT POTATO!"
+    case copycat = "🫸🫷 COPYCAT POSE!"
+    case bonus = "6️⃣7️⃣ 67 BONUS!"
 }
 
 struct DebugTrackerView: View {
     @ObservedObject var engine: TrackingEngine
     var onExit: () -> Void
     
-    // Default immediately to Stomp for testing
-    @State private var selectedScene: DebugScene = .stomp
+    // Default immediately to Wipe for testing
+    @State private var selectedScene: DebugScene = .wipe
     
     // 🧍‍♂️ Player 1 States
     @State private var mockScore: Int = 0
@@ -75,6 +74,7 @@ struct DebugTrackerView: View {
                     videoFilename: getVideoFilename(for: selectedScene),
                     onSkip: skipInstruction
                 )
+                .id(selectedScene)
                 .transition(.opacity)
                 .zIndex(100) // Forces it to the very top!
             }
@@ -273,14 +273,13 @@ struct DebugTrackerView: View {
     @ViewBuilder
     private func renderScene(for scene: DebugScene, score: Binding<Int>, progressText: Binding<String>, wins: Binding<Int>, zone: PlayerZone) -> some View {
         switch scene {
-        case .stomp: StompScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in wins.wrappedValue += 1 }
-        case .drill: DrillScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in wins.wrappedValue += 1 }
-        case .party: PartyScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in wins.wrappedValue += 1 }
-        case .dj: DJScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in wins.wrappedValue += 1 }
-        case .cymbals: CymbalScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in wins.wrappedValue += 1 }
-        case .furniture: FurnitureScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in wins.wrappedValue += 1 }
-        case .bonus: BonusScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in wins.wrappedValue += 1 }
         case .wipe: WipeScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in wins.wrappedValue += 1 }
+        case .fall: FallScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in wins.wrappedValue += 1 }
+        case .watering: WateringScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in wins.wrappedValue += 1 }
+        case .bubble: BubbleScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in wins.wrappedValue += 1 }
+        case .hotPotato: HotPotatoScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in wins.wrappedValue += 1 }
+        case .copycat: CopycatScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in wins.wrappedValue += 1 }
+        case .bonus: BonusScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in wins.wrappedValue += 1 }
         }
     }
     
@@ -326,41 +325,37 @@ struct DebugTrackerView: View {
     
     private func getActionWord(for scene: DebugScene) -> String {
         switch scene {
-        case .stomp: return "STOMP THE FLOOR!"
-        case .drill: return "POWER DRILL!"
-        case .party: return "IT'S A PARTY!"
-        case .dj: return "DJ TIME!"
-        case .cymbals: return "CYMBALS PRACTICE!"
-        case .furniture: return "HOME RENO!"
-        case .bonus: return "67 REDEMPTION!"
         case .wipe: return "WIPE THE WINDOW!"
+        case .fall: return "CATCH THE FRUITS!"
+        case .watering: return "WATER THE GARDEN!"
+        case .bubble: return "POP THE BUBBLES!"
+        case .hotPotato: return "HOT POTATO!"
+        case .copycat: return "COPYCAT POSE!"
+        case .bonus: return "67 REDEMPTION!"
         }
     }
     
     private func getInstruction(for scene: DebugScene) -> String {
         switch scene {
-        case .stomp: return "STOMP your hands past the line!"
-        case .drill: return "TAP the targets to drill holes!"
-        case .party: return "WAVE your hands to the targets!"
-        case .dj: return "MOVE your hands left and right like a DJ!"
-        case .cymbals: return "CLAP your hands together loudly!"
-        case .furniture: return "PINCH the furniture and DRAG it away!"
+        case .wipe: return "WIPE your hand across the screen to clean the window!"
+        case .fall: return "SLIDE your basket left and right to catch the falling fruits!"
+        case .watering: return "PINCH and TILT your watering can to bloom the plants!"
+        case .bubble: return "TAP and POP the floating bubbles with your fingers!"
+        case .hotPotato: return "SWAT the hot durian before it burns you!"
+        case .copycat: return "MATCH the hand poses shown on screen!"
         case .bonus: return "ALTERNATE PUMPING your arms up and down!"
-        case .wipe: return "WIPE your cloth across the screen to clean the window!"
         }
     }
     
-    // ⬅️ NEW: Helper to fetch the video filename for the specific scene
     private func getVideoFilename(for scene: DebugScene) -> String? {
         switch scene {
-        case .stomp: return "Stomp_Recording"
-        case .drill: return "Tap_Recording"
-        case .party: return "Wave_Recording"
-        case .dj: return "DJ_Recording"
-        case .cymbals: return "Clap_Recording"
-        case .furniture: return "Pinch_Recording"
-        case .bonus: return "67_Recording"
-        case .wipe: return "Wave_Recording"
+        case .wipe: return "Wave_Recording"       // Waving hand = wiping window
+        case .fall: return "DJ_Recording"         // Moving hands left & right = sliding fruit basket
+        case .watering: return "Pinch_Recording"  // Pinching fingers = pinching & pouring watering can
+        case .bubble: return "Tap_Recording"      // Finger tap = popping bubbles
+        case .hotPotato: return "Wave_Recording"  // Hand swat = slapping durian
+        case .copycat: return "Clap_Recording"    // Clapping hands = TOS push-hand pose
+        case .bonus: return "67_Recording"        // Alternating arm pumps = 67 redemption
         }
     }
 }

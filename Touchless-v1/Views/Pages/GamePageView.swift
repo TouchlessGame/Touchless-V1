@@ -69,6 +69,7 @@ struct GamePageView: View {
                         videoFilename: getVideoFilename(),
                         onSkip: skipInstruction
                     )
+                    .id("\(director.currentRoundIndex)-\(director.currentGame)")
                     .transition(.opacity)
                     .zIndex(100) // Forces it to the very top!
                 }
@@ -78,8 +79,8 @@ struct GamePageView: View {
             director.start(rounds: rounds)
             triggerInstruction() // Fire instruction on round 1
         }
-        // Fire instruction every time the mini-game changes
-        .onChange(of: director.currentGame) { _ in
+        // Fire instruction every time a new round starts
+        .onChange(of: director.currentRoundIndex) { _ in
             triggerInstruction()
         }
     }
@@ -132,14 +133,13 @@ struct GamePageView: View {
     @ViewBuilder
     private func renderActiveGame(score: Binding<Int>, progressText: Binding<String>, zone: PlayerZone) -> some View {
         switch director.currentGame {
-        case .stomp: StompScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in }
-        case .drill: DrillScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in }
-        case .party: PartyScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in }
-        case .dj: DJScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in }
-        case .cymbals: CymbalScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in }
-        case .furniture: FurnitureScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in }
-        case .bonus: BonusScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in }
         case .wipe: WipeScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in }
+        case .fall: FallScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in }
+        case .watering: WateringScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in }
+        case .bubble: BubbleScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in }
+        case .hotPotato: HotPotatoScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in }
+        case .copycat: CopycatScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in }
+        case .bonus: BonusScene(engine: engine, score: score, progressText: progressText, playerZone: zone) { _ in }
         }
     }
     
@@ -269,14 +269,13 @@ struct GamePageView: View {
     // --- UI HELPERS & LOGIC ---
     private func getVideoFilename() -> String? {
         switch director.currentGame {
-        case .stomp: return "Stomp_Recording"
-        case .drill: return "Tap_Recording"
-        case .party: return "Wave_Recording"
-        case .dj: return "DJ_Recording"
-        case .cymbals: return "Clap_Recording"
-        case .furniture: return "Pinch_Recording"
-        case .bonus: return "67_Recording"
-        case .wipe: return "Wave_Recording"
+        case .wipe: return "Wave_Recording"       // Waving hand = wiping window
+        case .fall: return "DJ_Recording"         // Moving hands left & right = sliding fruit basket
+        case .watering: return "Pinch_Recording"  // Pinching fingers = pinching & pouring watering can
+        case .bubble: return "Tap_Recording"      // Finger tap = popping bubbles
+        case .hotPotato: return "Wave_Recording"  // Hand swat = slapping durian
+        case .copycat: return "Clap_Recording"    // Clapping hands = TOS push-hand pose
+        case .bonus: return "67_Recording"        // Alternating arm pumps = 67 redemption
         }
     }
 
@@ -308,27 +307,25 @@ struct GamePageView: View {
     
     private func getActionWord() -> String {
         switch director.currentGame {
-        case .stomp: return "STOMP THE FLOOR!"
-        case .drill: return "POWER DRILL!"
-        case .party: return "IT'S A PARTY!"
-        case .dj: return "DJ TIME!"
-        case .cymbals: return "CYMBALS PRACTICE!"
-        case .furniture: return "HOME RENO!"
-        case .bonus: return "67 REDEMPTION!"
         case .wipe: return "WIPE THE WINDOW!"
+        case .fall: return "CATCH THE FRUITS!"
+        case .watering: return "WATER THE GARDEN!"
+        case .bubble: return "POP THE BUBBLES!"
+        case .hotPotato: return "HOT POTATO!"
+        case .copycat: return "COPYCAT POSE!"
+        case .bonus: return "67 REDEMPTION!"
         }
     }
     
     private func getInstruction() -> String {
         switch director.currentGame {
-        case .stomp: return "STOMP your hands past the line!"
-        case .drill: return "TAP the targets to drill holes"
-        case .party: return "WAVE your hands to the targets!"
-        case .dj: return "MOVE your hands left and right like a DJ!"
-        case .cymbals: return "CLAP your hands together loudly!"
-        case .furniture: return "PINCH the furniture and DRAG it away!"
+        case .wipe: return "WIPE your hand across the screen to clean the window!"
+        case .fall: return "SLIDE your basket left and right to catch the falling fruits!"
+        case .watering: return "PINCH and TILT your watering can to bloom the plants!"
+        case .bubble: return "TAP and POP the floating bubbles with your fingers!"
+        case .hotPotato: return "SWAT the hot durian before it burns you!"
+        case .copycat: return "MATCH the hand poses shown on screen!"
         case .bonus: return "ALTERNATE PUMPING your arms up and down!"
-        case .wipe: return "WIPE your cloth across the screen to clean the window!"
         }
     }
     

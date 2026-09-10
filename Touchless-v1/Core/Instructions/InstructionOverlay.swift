@@ -33,6 +33,7 @@ struct InstructionOverlay: View {
                 // 2. THE VIDEO PLAYER (Middle - Only appears if a filename was passed in)
                 if let filename = videoFilename {
                     LoopingVideoPlayer(filename: filename)
+                        .id(filename)
                         .frame(width: 420, height: 300)
                         .cornerRadius(22)
                         .overlay(

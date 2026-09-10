@@ -14,18 +14,27 @@ struct ResultsPageView: View {
     @State private var displayedP1Score: Int = 0
     @State private var displayedP2Score: Int = 0
     @State private var showButtons: Bool = false
+    @State private var logoImage: NSImage? = MainMenuView.loadLogo()
     
     var body: some View {
         ZStack {
             // 1. FIX: Semi-transparent background so the camera shows through!
             Color.black.opacity(0.8).ignoresSafeArea()
             
-            VStack(spacing: 40) {
+            VStack(spacing: 30) {
                 
                 // 2. Header
-                VStack(spacing: 10) {
-                    Text("CHAOS COMPLETE!")
-                        .font(.system(size: 50, weight: .black, design: .rounded))
+                VStack(spacing: 8) {
+                    if let logo = logoImage {
+                        Image(nsImage: logo)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: 190, maxHeight: 100)
+                            .shadow(color: .black.opacity(0.35), radius: 8, y: 4)
+                    }
+                    
+                    Text("GAME OVER!")
+                        .font(.system(size: 44, weight: .black, design: .rounded))
                         .foregroundColor(.white)
                         .shadow(color: .red, radius: 10)
                     
@@ -33,7 +42,7 @@ struct ResultsPageView: View {
                         .font(.title2.bold())
                         .foregroundColor(.yellow)
                 }
-                .padding(.top, 40)
+                .padding(.top, 25)
                 
                 Spacer()
                 
@@ -94,18 +103,18 @@ struct ResultsPageView: View {
     }
     
     private func getWinnerText() -> String {
-        if !isMultiplayer { return "THE NEIGHBORS HATE YOU." }
-        if p1Score > p2Score { return "PLAYER 1 IS THE WORST NEIGHBOR!" }
-        if p2Score > p1Score { return "PLAYER 2 IS THE WORST NEIGHBOR!" }
-        return "IT'S A TIE! EVERYONE LOSES!"
+        if !isMultiplayer { return "GREAT GAME!" }
+        if p1Score > p2Score { return "PLAYER 1 WINS!" }
+        if p2Score > p1Score { return "PLAYER 2 WINS!" }
+        return "IT'S A TIE! BOTH PLAYERS ROCK!"
     }
     
     private func calculateRank(score: Int) -> String {
         switch score {
-        case 0...200: return "Polite Ghost 👻"
-        case 201...500: return "Mild Annoyance 🐭"
-        case 501...1000: return "Public Nuisance 📢"
-        default: return "MENACE TO SOCIETY 👹"
+        case 0...200: return "Rookie Groover 🌟"
+        case 201...500: return "Rhythm Master ✨"
+        case 501...1000: return "Super Star 💫"
+        default: return "SIDE BY SIDE CHAMPION 👑"
         }
     }
     

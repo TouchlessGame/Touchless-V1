@@ -3,24 +3,23 @@ import Combine
 
 // 1. THE DATABASE: Centralized Metadata for all games
 enum MiniGame: CaseIterable {
-    case stomp, drill, party, dj, cymbals, furniture, bonus, wipe
+    case wipe, fall, watering, bubble, hotPotato, copycat, bonus
     
     static var normalGames: [MiniGame] {
-        return [.stomp, .drill, .party, .dj, .cymbals, .furniture, .wipe]
+        return [.wipe, .fall, .watering, .bubble]
     }
     var timeLimit: Double {
         switch self {
-        case .drill, .wipe: return 7.0
         case .bonus: return 9.0
-        default: return 5.0
+        default: return 7.0
         }
     }
 }
 
 // 2. THE REFEREE: Manages the clock and the game flow
 class GameDirector: ObservableObject {
-    @Published var currentGame: MiniGame = .stomp
-    @Published var timeRemaining: Double = 5.0
+    @Published var currentGame: MiniGame = .wipe
+    @Published var timeRemaining: Double = 7.0
     
     // 🔧 SEQUENCE SETTINGS
     @Published var isSequenceComplete: Bool = false
@@ -89,10 +88,10 @@ class GameDirector: ObservableObject {
         }
         
         // Otherwise, pick a random normal game
-        var nextGame = MiniGame.normalGames.randomElement() ?? .stomp
+        var nextGame = MiniGame.normalGames.randomElement() ?? .wipe
         if !isFirstRound {
-            while nextGame == currentGame {
-                nextGame = MiniGame.normalGames.randomElement() ?? .stomp
+            while nextGame == currentGame && MiniGame.normalGames.count > 1 {
+                nextGame = MiniGame.normalGames.randomElement() ?? .wipe
             }
         }
         
